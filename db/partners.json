@@ -13,7 +13,7 @@
     "time_of_delivery": 60,
     "stars": 4.3,
     "price": 1200,
-    "kitchen": "Суши и роллы",
+    "kitchen": "Суши, роллы",
     "image": "img/tanuki/preview.jpg",
     "products": "tanuki.json"
   },

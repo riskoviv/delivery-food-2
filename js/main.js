@@ -126,28 +126,32 @@ function createCardRestaurant({
   products,
   time_of_delivery: timeOfDelivery,
 }) {
-  const card = `
-  <a class="card card-restaurant"
-  data-products="${products}"
-  data-info="${[name, price, stars, kitchen]}">
-    <img src="${image}" alt="${name}" class="card-image" />
-    <div class="card-text">
-      <div class="card-heading">
-        <h3 class="card-title">${name}</h3>
-        <span class="card-tag tag">${timeOfDelivery} мин</span>
-      </div>
-      <div class="card-info">
-        <div class="rating">
-          ${stars}
-        </div>
-        <div class="price">От ${price} ₽</div>
-        <div class="category">${kitchen}</div>
-      </div>
-    </div>
-  </a>
-  `;
+  const card = document.createElement("a");
+  card.className = "card card-restaurant";
+  card.products = products;
+  card.info = [name, price, stars, kitchen];
 
-  cardsRestaurants.insertAdjacentHTML("beforeend", card);
+  card.insertAdjacentHTML(
+    "beforeend",
+    `
+      <img src="${image}" alt="${name}" class="card-image" />
+      <div class="card-text">
+        <div class="card-heading">
+          <h3 class="card-title">${name}</h3>
+          <span class="card-tag tag">${timeOfDelivery} мин</span>
+        </div>
+        <div class="card-info">
+          <div class="rating">
+            ${stars}
+          </div>
+          <div class="price">От ${price} ₽</div>
+          <div class="category">${kitchen}</div>
+        </div>
+      </div>
+    `
+  );
+
+  cardsRestaurants.insertAdjacentElement("beforeend", card);
 }
 
 function createCardGood({ name, description, price, image }) {
@@ -186,9 +190,7 @@ function openGoods(event) {
     const restaurant = target.closest(".card-restaurant");
 
     if (restaurant) {
-      const info = restaurant.dataset.info.split(",");
-
-      const [name, price, stars, kitchen] = info;
+      const [name, price, stars, kitchen] = restaurant.info;
 
       cardsMenu.textContent = "";
       containerPromo.classList.add("hide");
@@ -200,7 +202,7 @@ function openGoods(event) {
       minPrice.textContent = `От ${price} ₽`;
       category.textContent = kitchen;
 
-      getData(`./db/${restaurant.dataset.products}`).then(function (data) {
+      getData(`./db/${restaurant.products}`).then(function (data) {
         data.forEach(createCardGood);
       });
     }
