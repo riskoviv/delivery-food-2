@@ -16,7 +16,10 @@ const restaurants = document.querySelector(".restaurants");
 const menu = document.querySelector(".menu");
 const logo = document.querySelector(".logo");
 const cardsMenu = document.querySelector(".cards-menu");
-const menuHeading = document.querySelector(".menu-heading");
+const restaurantTitle = document.querySelector(".restaurant-title");
+const rating = document.querySelector(".rating");
+const minPrice = document.querySelector(".price");
+const category = document.querySelector(".category");
 
 let login = localStorage.getItem("deliveryFood");
 
@@ -83,7 +86,7 @@ function notAuthorized() {
     event.preventDefault();
 
     if (loginInput.value.trim()) {
-      login = loginInput.value;
+      login = loginInput.value.trim();
 
       localStorage.setItem("deliveryFood", login);
 
@@ -124,7 +127,9 @@ function createCardRestaurant({
   time_of_delivery: timeOfDelivery,
 }) {
   const card = `
-  <a class="card card-restaurant" data-products="${products}" data-name="${name}" data-stars="${stars}" data-price="${price}" data-kitchen="${kitchen}">
+  <a class="card card-restaurant"
+  data-products="${products}"
+  data-info="${[name, price, stars, kitchen]}">
     <img src="${image}" alt="${name}" class="card-image" />
     <div class="card-text">
       <div class="card-heading">
@@ -174,44 +179,32 @@ function createCardGood({ name, description, price, image }) {
   cardsMenu.insertAdjacentElement("beforeend", card);
 }
 
-function createRestaurantInfo(name, stars, price, kitchen) {
-  const heading = `
-    <h2 class="section-title restaurant-title">${name}</h2>
-    <div class="card-info">
-      <div class="rating">
-        ${stars}
-      </div>
-      <div class="price">От ${price} ₽</div>
-      <div class="category">${kitchen}</div>
-    </div>
-  `;
-  menuHeading.insertAdjacentHTML("beforeend", heading);
-}
-
 function openGoods(event) {
   const target = event.target;
-  const restaurant = target.closest(".card-restaurant");
 
   if (login) {
+    const restaurant = target.closest(".card-restaurant");
+
     if (restaurant) {
-      menuHeading.textContent = "";
+      const info = restaurant.dataset.info.split(",");
+
+      const [name, price, stars, kitchen] = info;
+
       cardsMenu.textContent = "";
       containerPromo.classList.add("hide");
       restaurants.classList.add("hide");
       menu.classList.remove("hide");
 
-      createRestaurantInfo(
-        `${restaurant.dataset.name}`,
-        `${restaurant.dataset.stars}`,
-        `${restaurant.dataset.price}`,
-        `${restaurant.dataset.kitchen}`
-      );
+      restaurantTitle.textContent = name;
+      rating.textContent = stars;
+      minPrice.textContent = `От ${price} ₽`;
+      category.textContent = kitchen;
 
       getData(`./db/${restaurant.dataset.products}`).then(function (data) {
         data.forEach(createCardGood);
       });
     }
-  } else if (restaurant) {
+  } else {
     toggleModalAuth();
   }
 }
