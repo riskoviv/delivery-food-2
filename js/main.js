@@ -82,7 +82,7 @@ function notAuthorized() {
   function logIn(event) {
     event.preventDefault();
 
-    if (loginInput.value) {
+    if (loginInput.value.trim()) {
       login = loginInput.value;
 
       localStorage.setItem("deliveryFood", login);
@@ -94,6 +94,7 @@ function notAuthorized() {
       logInForm.reset();
       checkAuth();
     } else {
+      loginInput.value = "";
       loginInput.style.backgroundColor = "red";
       loginInput.placeholder = "Введите логин!";
     }
@@ -124,7 +125,7 @@ function createCardRestaurant({
 }) {
   const card = `
   <a class="card card-restaurant" data-products="${products}" data-name="${name}" data-stars="${stars}" data-price="${price}" data-kitchen="${kitchen}">
-    <img src="${image}" alt="image" class="card-image" />
+    <img src="${image}" alt="${name}" class="card-image" />
     <div class="card-text">
       <div class="card-heading">
         <h3 class="card-title">${name}</h3>
@@ -150,7 +151,7 @@ function createCardGood({ name, description, price, image }) {
   card.insertAdjacentHTML(
     "beforeend",
     `
-    <img src="${image}" alt="image" class="card-image" />
+    <img src="${image}" alt="${name}" class="card-image" />
     <div class="card-text">
       <div class="card-heading">
         <h3 class="card-title card-title-reg">${name}</h3>
