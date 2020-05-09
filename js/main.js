@@ -23,11 +23,13 @@ const category = document.querySelector(".category");
 const inputSearch = document.querySelector(".input-search");
 const modalBody = document.querySelector(".modal-body");
 const modalPrice = document.querySelector(".modal-pricetag");
-const buttonCearCart = document.querySelector('.clear-cart');
+const buttonClearCart = document.querySelector('.clear-cart');
 
-let login = localStorage.getItem("deliveryFood");
+let login = localStorage.getItem('deliveryFood');
 
-const cart = [];
+const cart = localStorage.getItem('cart')
+  ? JSON.parse(localStorage.getItem('cart'))
+  : [];
 
 const getData = async function (url) {
   const response = await fetch(url);
@@ -64,7 +66,9 @@ function returnMain() {
 function authorized() {
   function logOut() {
     login = null;
-    localStorage.removeItem("deliveryFood");
+    cart.length = 0;
+    localStorage.removeItem('deliveryFood');
+    localStorage.removeItem('cart');
 
     buttonAuth.style.display = "";
     userName.style.display = "";
@@ -76,8 +80,6 @@ function authorized() {
     checkAuth();
   }
 
-  console.log("Авторизован");
-
   userName.textContent = login;
 
   buttonAuth.style.display = "none";
@@ -88,7 +90,6 @@ function authorized() {
 }
 
 function notAuthorized() {
-  console.log("Не авторизован");
 
   function logIn(event) {
     event.preventDefault();
@@ -244,7 +245,7 @@ function addToCart(event) {
         count: 1
       });
     }
-
+    localStorage.setItem('cart', JSON.stringify(cart));
   }
 
 }
@@ -267,6 +268,8 @@ function renderCart() {
 
     modalBody.insertAdjacentHTML('afterbegin', itemCart);
   });
+
+  localStorage.setItem('cart', JSON.stringify(cart));
 
   const totalPrice = cart.reduce(function (result, item) {
     return result + (parseFloat(item.cost)) * item.count;
@@ -307,7 +310,7 @@ function init() {
     toggleModal();
   });
 
-  buttonCearCart.addEventListener('click', function () {
+  buttonClearCart.addEventListener('click', function () {
     cart.length = 0;
     renderCart();
   })
@@ -357,8 +360,6 @@ function init() {
                 const searchGoods = goods.filter(function (item) {
                   return item.name.toLowerCase().includes(value);
                 })
-
-                console.log(searchGoods);
 
                 cardsMenu.textContent = "";
                 containerPromo.classList.add("hide");
