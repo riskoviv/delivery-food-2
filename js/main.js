@@ -1,40 +1,47 @@
 'use strict';
 
-const cartButton = document.querySelector('#cart-button');
-const modal = document.querySelector('.modal');
-const close = document.querySelector('.close');
-const buttonAuth = document.querySelector('.button-auth');
-const modalAuth = document.querySelector('.modal-auth');
-const closeAuth = document.querySelector('.close-auth');
-const logInForm = document.querySelector('#logInForm');
-const loginInput = document.querySelector('#login');
-const userName = document.querySelector('.user-name');
-const buttonOut = document.querySelector('.button-out');
-const cardsRestaurants = document.querySelector('.cards-restaurants');
-const containerPromo = document.querySelector('.container-promo');
-const restaurants = document.querySelector('.restaurants');
-const menu = document.querySelector('.menu');
-const logo = document.querySelector('.logo');
-const cardsMenu = document.querySelector('.cards-menu');
-const restaurantTitle = document.querySelector('.restaurant-title');
-const rating = document.querySelector('.rating');
-const minPrice = document.querySelector('.price');
-const category = document.querySelector('.category');
-const inputSearch = document.querySelector('.input-search');
-const modalBody = document.querySelector('.modal-body');
-const modalPrice = document.querySelector('.modal-pricetag');
-const buttonClearCart = document.querySelector('.clear-cart');
+const cartButton = document.querySelector('#cart-button'),
+  modal = document.querySelector('.modal'),
+  close = document.querySelector('.close'),
+  buttonAuth = document.querySelector('.button-auth'),
+  modalAuth = document.querySelector('.modal-auth'),
+  closeAuth = document.querySelector('.close-auth'),
+  logInForm = document.querySelector('#logInForm'),
+  loginInput = document.querySelector('#login'),
+  userName = document.querySelector('.user-name'),
+  buttonOut = document.querySelector('.button-out'),
+  cardsRestaurants = document.querySelector('.cards-restaurants'),
+  containerPromo = document.querySelector('.container-promo'),
+  restaurants = document.querySelector('.restaurants'),
+  menu = document.querySelector('.menu'),
+  logo = document.querySelector('.logo'),
+  cardsMenu = document.querySelector('.cards-menu'),
+  restaurantTitle = document.querySelector('.restaurant-title'),
+  rating = document.querySelector('.rating'),
+  minPrice = document.querySelector('.price'),
+  category = document.querySelector('.category'),
+  inputSearch = document.querySelector('.input-search'),
+  modalBody = document.querySelector('.modal-body'),
+  modalPrice = document.querySelector('.modal-pricetag'),
+  buttonClearCart = document.querySelector('.clear-cart');
 
-let login = localStorage.getItem('deliveryFood');
+let login = localStorage.getItem('login');
 
-const valid = function (str) {
+const valid = (str) => {
   const nameReg = /^[a-zA-Z][a-zA-Z0-9-_\.]{1,20}$/;
   return nameReg.test(str);
+};
+
+const cart = login ? JSON.parse(localStorage.getItem(login + '_cart')) : [];
+
+const loadCart = () => {
+  if (localStorage.getItem(login + '_cart')) {
+    cart.push(...JSON.parse(localStorage.getItem(login + '_cart')));
+  }
 }
 
-const cart = localStorage.getItem('cart')
-  ? JSON.parse(localStorage.getItem('cart'))
-  : [];
+const saveCart = () =>
+  localStorage.setItem(login + '_cart', JSON.stringify(cart));
 
 const getData = async function (url) {
   const response = await fetch(url);
@@ -47,33 +54,36 @@ const getData = async function (url) {
   return await response.json();
 };
 
-const resetLoginInput = function () {
-  loginInput.style.backgroundColor = '';
+const resetLoginInput = () => {
+  loginInput.style.borderColor = '';
   loginInput.placeholder = '';
 };
 
-const toggleModal = function () {
+const toggleModal = () => {
   modal.classList.toggle('is-open');
 };
 
-const toggleModalAuth = function () {
+const toggleModalAuth = () => {
   modalAuth.classList.toggle('is-open');
   resetLoginInput();
   logInForm.reset();
 };
 
-function returnMain() {
+const returnMain = () => {
   containerPromo.classList.remove('hide');
   restaurants.classList.remove('hide');
   menu.classList.add('hide');
-}
+};
 
-function authorized() {
-  function logOut() {
-    login = null;
+const authorized = () => {
+  const logOut = () => {
+    if (cart.length === 0) {
+      localStorage.removeItem(login + '_cart');
+    }
     cart.length = 0;
-    localStorage.removeItem('deliveryFood');
-    localStorage.removeItem('cart');
+
+    login = null;
+    localStorage.removeItem('login');
 
     buttonAuth.style.display = '';
     userName.style.display = '';
@@ -83,7 +93,7 @@ function authorized() {
     buttonOut.removeEventListener('click', logOut);
     returnMain();
     checkAuth();
-  }
+  };
 
   userName.textContent = login;
 
@@ -92,17 +102,18 @@ function authorized() {
   buttonOut.style.display = 'flex';
   cartButton.style.display = 'flex';
   buttonOut.addEventListener('click', logOut);
-}
+  loadCart();
+};
 
-function notAuthorized() {
+const notAuthorized = () => {
 
-  function logIn(event) {
+  const logIn = (event) => {
     event.preventDefault();
 
     if (valid(loginInput.value.trim())) {
       login = loginInput.value.trim();
 
-      localStorage.setItem('deliveryFood', login);
+      localStorage.setItem('login', login);
 
       toggleModalAuth();
       buttonAuth.removeEventListener('click', toggleModalAuth);
@@ -112,26 +123,21 @@ function notAuthorized() {
       checkAuth();
     } else {
       loginInput.value = '';
-      loginInput.style.backgroundColor = 'tomato';
+      loginInput.style.borderColor = 'red';
       loginInput.placeholder = 'Введите логин!';
     }
-  }
+  };
 
   buttonAuth.addEventListener('click', toggleModalAuth);
   closeAuth.addEventListener('click', toggleModalAuth);
   logInForm.addEventListener('submit', logIn);
   loginInput.addEventListener('input', resetLoginInput);
-}
+};
 
-function checkAuth() {
-  if (login) {
-    authorized();
-  } else {
-    notAuthorized();
-  }
-}
+const checkAuth = () => login ? authorized() : notAuthorized();
 
-function createCardRestaurant({
+
+const createCardRestaurant = ({
   image,
   kitchen,
   name,
@@ -139,7 +145,7 @@ function createCardRestaurant({
   stars,
   products,
   time_of_delivery: timeOfDelivery,
-}) {
+}) => {
   const card = document.createElement('a');
   card.className = 'card card-restaurant';
   card.products = products;
@@ -166,9 +172,9 @@ function createCardRestaurant({
   );
 
   cardsRestaurants.insertAdjacentElement('beforeend', card);
-}
+};
 
-function createCardGood({ name, description, price, image, id }) {
+const createCardGood = ({ name, description, price, image, id }) => {
   const card = document.createElement('div');
   card.className = 'card';
 
@@ -196,9 +202,9 @@ function createCardGood({ name, description, price, image, id }) {
   );
 
   cardsMenu.insertAdjacentElement('beforeend', card);
-}
+};
 
-function openGoods(event) {
+const openGoods = (event) => {
   const target = event.target;
 
   if (login) {
@@ -224,9 +230,9 @@ function openGoods(event) {
   } else {
     toggleModalAuth();
   }
-}
+};
 
-function addToCart(event) {
+const addToCart = (event) => {
 
   const target = event.target;
   const buttonAddToCart = target.closest('.button-add-cart');
@@ -250,12 +256,12 @@ function addToCart(event) {
         count: 1
       });
     }
-    localStorage.setItem('cart', JSON.stringify(cart));
+    saveCart();
   }
 
-}
+};
 
-function renderCart() {
+const renderCart = () => {
   modalBody.textContent = '';
 
   cart.forEach(function ({ id, title, cost, count }) {
@@ -274,7 +280,8 @@ function renderCart() {
     modalBody.insertAdjacentHTML('afterbegin', itemCart);
   });
 
-  localStorage.setItem('cart', JSON.stringify(cart));
+
+  saveCart();
 
   const totalPrice = cart.reduce(function (result, item) {
     return result + (parseFloat(item.cost)) * item.count;
@@ -282,9 +289,9 @@ function renderCart() {
 
   modalPrice.textContent = totalPrice + ' ₽';
 
-}
+};
 
-function changeCount(event) {
+const changeCount = (event) => {
   const target = event.target;
 
   if (target.classList.contains('counter-button')) {
