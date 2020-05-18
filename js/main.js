@@ -2,7 +2,7 @@
 
 const cartButton = document.querySelector('#cart-button'),
   modal = document.querySelector('.modal'),
-  close = document.querySelector('.close'),
+  closeButton = document.querySelector('.close'),
   buttonAuth = document.querySelector('.button-auth'),
   modalAuth = document.querySelector('.modal-auth'),
   closeAuth = document.querySelector('.close-auth'),
@@ -331,7 +331,7 @@ function init() {
 
   cardsMenu.addEventListener('click', addToCart);
 
-  close.addEventListener('click', toggleModal);
+  closeButton.addEventListener('click', toggleModal);
 
   cardsRestaurants.addEventListener('click', openGoods);
 
